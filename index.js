@@ -5,6 +5,7 @@ var express = require("express");
 var app = express();
 var massive = require("massive");
 const cors = require('cors');
+const boom = require('express-boom');
 
 // Auth middleware
 const authenticateUser = require('./middleware/authenticateUser');
@@ -15,6 +16,9 @@ const issueToken = require('./middleware/issueToken');
 
 // Env
 const { CONNECTION_STRING } = process.env;
+
+// For easy error handling
+app.use(boom());
 
 // For parsing body of incoming post requests
 app.use(express.json());
@@ -35,16 +39,16 @@ app.post('/auth/signin', authenticateUser, issueToken);
 
 
 // Not found
-app.use(function (req, res, next) {
-  const err = new Error("Page not found");
-  err.statusCode = 404;
-  return next(err);
-});
+app.use((req, res, next) => res.boom.notFound());
 
 //Error handler
 app.use((err, req, res, next) => {
-  console.log(err.message)
-  res.status(err.statusCode || 400).send(err.message || 'Something went wrong and your account was not created')
+  const error = { };
+  error.statusCode = err.statusCode || 500;
+  error.message = err.message || 'Oops! Something went wrong on our end.';
+
+  res.send(err);
+
 });
 
 // Listen
