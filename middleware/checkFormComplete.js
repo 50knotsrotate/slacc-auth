@@ -10,7 +10,7 @@
 function checkFormComplete(req, res, next) {
   const { username, password } = req.body;
 
-  const usernameRegex = /^[A-Za-z0-9 ]{5,31}$/;
+  const usernameRegex = /^[a-z0-9]{5,31}$/i;
 
   /*
     Got this password regex from stackoverflow. I gotta give credit where its due.
@@ -26,20 +26,14 @@ function checkFormComplete(req, res, next) {
   const isValidPassword = passwordRegex.test(password);
 
   if (!isValidUsername) { 
-    const err = new Error();
-    err.message = 'Username must be 5-31 characters long and contain no special characters'
-    err.statusCode = 400;
-    next(err)
+    return res.boom.badRequest("Username must be 5-31 characters long and contain no special characters");
   }
 
   if (!isValidPassword) { 
-    const err = new Error();
-    err.message = "Password must be at least 8 characters with at least one letter and one number";
-    err.statusCode = 400;
-    next(err);
+   return res.boom.badRequest("Password must be 5-31 characters long and contain no special characters");
   }
 
-  return next();
+  next();
 }
 
 module.exports = checkFormComplete;

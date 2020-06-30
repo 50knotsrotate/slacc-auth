@@ -42,14 +42,12 @@ function issueToken(req, res, next) {
   const token = jwt.sign(payload, secret, options);
 
   if (!token) { 
-    const err = new Error();
-    err.message = 'There was a problem on our end. Please try again.'
-    next(err)
+    return res.boom.badRequest("There was a problem on our end. Please try again.");
   }
 
   res.cookie('identifier', token);
 
-  return res.status(200).send();
+  res.status(200).send();
 
 }
 

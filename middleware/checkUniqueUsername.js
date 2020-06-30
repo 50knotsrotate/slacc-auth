@@ -16,24 +16,21 @@ async function checkUniqueUsername(req, res, next) {
 
   const { username } = req.body;
 
-
   /* 
     If the DB is queried for a user record with the provided username, 
     and an empty array is returned, it is a unique username and the 
     response can continue. If a record IS found, forward that error to the error handler
   */
 
-   db.query(`SELECT * FROM USERS USERS WHERE USERS.USERNAME = '${username}'`)
-    .then((user) => {
-      if (user.length) {
-        const err = new Error();
-        err.statusCode - 400;
-        err.message = 'Sorry, that username is taken.'
-        next(err)
-    } else {
-      next();
-    }
-  });
+  const user = await db.query(
+    `SELECT * FROM USERS USERS WHERE USERS.USERNAME = '${username}'`
+  );
+
+  if (user[0]) {
+    return res.boom.badRequest("Sorry, that username is taken");
+  }
+
+  next();
 }
 
 module.exports = checkUniqueUsername;
