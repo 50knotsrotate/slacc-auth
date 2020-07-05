@@ -18,7 +18,7 @@ async function checkUniqueUsername(req, res, next) {
 
   // If a user was not found, return an error.
   if (!user[0]) {
-    res.boom.badRequest("That password is incorrect");
+    return res.boom.badRequest("darn it to heck, we cant find you. Double check your username.");
   }
 
   // Check the provided password against what was stored in the DB

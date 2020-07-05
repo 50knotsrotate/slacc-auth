@@ -11,7 +11,6 @@ function issueToken(req, res, next) {
 
   /*  JWT config.  */
 
-  // You should use a cache here. 
   const data = {
     identifier: username
   };
