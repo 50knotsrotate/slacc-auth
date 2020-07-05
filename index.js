@@ -18,6 +18,9 @@ const checkUniqueUsername = require("./middleware/checkUniqueUsername");
 const saveUser = require("./middleware/saveUser");
 const issueToken = require("./middleware/issueToken");
 
+// Utils
+const asyncMiddleware = require('./utils');
+
 // Env
 const { CONNECTION_STRING } = process.env;
 
@@ -38,20 +41,19 @@ massive(CONNECTION_STRING).then(db => {
   .catch((err) => console.log("failed to connect to db: " + err));
 
 // Endpoints
-app.post("/auth/signup",checkFormComplete,checkUniqueUsername,saveUser, issueToken);
-app.post("/auth/signin", authenticateUser, issueToken);
+app.post("/auth/signup",checkFormComplete, asyncMiddleware(checkUniqueUsername), asyncMiddleware(saveUser), issueToken);
+app.post("/auth/signin", asyncMiddleware(authenticateUser), asyncMiddleware(issueToken));
 
 // Not found
 app.use((req, res, next) => res.boom.notFound());
 
 
 app.use((err, req, res, next) => {
-
   const error = {};
   error.statusCode = err.statusCode || 500;
   error.message = err.message || "Oops! Something went wrong on our end.";
 
-  res.send(err);
+  res.send(error);
 });
 
 // Listen
